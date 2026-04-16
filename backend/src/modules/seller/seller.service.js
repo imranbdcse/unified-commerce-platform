@@ -160,7 +160,7 @@ const getSellerTrend = async (sellerId, days = 30) => {
   const result = await query(
     `SELECT DATE(created_at) as date, COUNT(*) as orders, COALESCE(SUM(total), 0) as sales
      FROM orders
-     WHERE seller_id = $1 AND created_at >= NOW() - ($2 * interval '1 day') AND status != 'cancelled'
+     WHERE seller_id = $1 AND created_at >= NOW() - INTERVAL '1 day' * $2 AND status != 'cancelled'
      GROUP BY DATE(created_at)
      ORDER BY date`,
     [sellerId, safeDays]
