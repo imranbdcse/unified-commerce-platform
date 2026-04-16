@@ -156,13 +156,14 @@ const getLeaderboard = async (period = 'monthly') => {
 
 // Trend data
 const getSellerTrend = async (sellerId, days = 30) => {
+  const safeDays = Math.min(Math.max(parseInt(days) || 30, 1), 365);
   const result = await query(
     `SELECT DATE(created_at) as date, COUNT(*) as orders, COALESCE(SUM(total), 0) as sales
      FROM orders
-     WHERE seller_id = $1 AND created_at >= NOW() - INTERVAL '${parseInt(days)} days' AND status != 'cancelled'
+     WHERE seller_id = $1 AND created_at >= NOW() - ($2 * interval '1 day') AND status != 'cancelled'
      GROUP BY DATE(created_at)
      ORDER BY date`,
-    [sellerId]
+    [sellerId, safeDays]
   );
   return result.rows;
 };

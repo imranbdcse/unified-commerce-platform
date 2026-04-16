@@ -5,6 +5,7 @@ const { Server } = require('socket.io');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
+const rateLimit = require('express-rate-limit');
 
 const routes = require('./routes');
 const errorHandler = require('./middleware/errorHandler');
@@ -37,6 +38,23 @@ app.use(morgan('dev'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
+// Rate limiting
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 300,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: 'Too many requests, please try again later.' },
+});
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: 'Too many authentication attempts, please try again later.' },
+});
+
 // Attach socket.io to request
 app.use((req, res, next) => {
   req.io = io;
@@ -44,7 +62,8 @@ app.use((req, res, next) => {
 });
 
 // Routes
-app.use('/api/v1', routes);
+app.use('/api/v1/auth', authLimiter);
+app.use('/api/v1', apiLimiter, routes);
 
 // Health check
 app.get('/health', (req, res) => {
