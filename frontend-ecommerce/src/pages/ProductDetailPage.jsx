@@ -50,8 +50,9 @@ const ProductDetailPage = () => {
   const discount = product.compare_price > product.price
     ? Math.round(((product.compare_price - product.price) / product.compare_price) * 100) : 0;
 
-  // Calculate installment amount using shared utility
-  const installmentAmount = calculateInstallmentAmount(product.price);
+  // Calculate total price based on quantity and installment amount
+  const totalPrice = product.price * quantity;
+  const installmentAmount = calculateInstallmentAmount(totalPrice);
 
   return (
     <div className="space-y-8">
@@ -76,8 +77,8 @@ const ProductDetailPage = () => {
               </>
             )}
           </div>
-          {/* Baadmay Installment Payment Option */}
-          {product.price >= BAADMAY_CONFIG.MIN_PRICE_THRESHOLD && (
+          {/* Baadmay Installment Payment Option - considers quantity */}
+          {totalPrice >= BAADMAY_CONFIG.MIN_PRICE_THRESHOLD && (
             <div className="flex items-center gap-2 bg-gray-50 p-2 rounded-lg">
               <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">baadmay</span>
               <span className="text-sm text-gray-700">
