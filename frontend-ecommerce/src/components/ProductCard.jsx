@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import useCartStore from '../stores/cartStore';
 import toast from 'react-hot-toast';
+import { BAADMAY_CONFIG, calculateInstallmentAmount } from '../constants/payment';
 
 const ProductCard = ({ product, view = 'grid' }) => {
   const { addItem } = useCartStore();
@@ -16,8 +17,8 @@ const ProductCard = ({ product, view = 'grid' }) => {
     ? Math.round(((product.compare_price - product.price) / product.compare_price) * 100)
     : 0;
 
-  // Calculate installment amount (divide by 3, round up to nearest whole number)
-  const installmentAmount = Math.ceil(product.price / 3);
+  // Calculate installment amount using shared utility
+  const installmentAmount = calculateInstallmentAmount(product.price);
 
   if (view === 'list') {
     return (
@@ -65,11 +66,11 @@ const ProductCard = ({ product, view = 'grid' }) => {
             <span className="text-gray-400 line-through text-xs">৳{product.compare_price?.toLocaleString()}</span>
           )}
         </div>
-        {/* Baadmay Installment Option for products >= 1000 */}
-        {product.price >= 1000 && (
+        {/* Baadmay Installment Option for products >= MIN_PRICE_THRESHOLD */}
+        {product.price >= BAADMAY_CONFIG.MIN_PRICE_THRESHOLD && (
           <div className="flex items-center gap-1 mb-2 text-xs">
             <span className="bg-green-500 text-white font-bold px-1.5 py-0.5 rounded text-[10px]">baadmay</span>
-            <span className="text-gray-600">3x ৳{installmentAmount.toLocaleString()}</span>
+            <span className="text-gray-600">{BAADMAY_CONFIG.NUM_INSTALLMENTS}x ৳{installmentAmount.toLocaleString()}</span>
           </div>
         )}
         <button onClick={handleAddToCart} className="w-full btn-primary text-sm py-2">

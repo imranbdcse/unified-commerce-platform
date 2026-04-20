@@ -5,6 +5,7 @@ import ProductCard from '../components/ProductCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import useCartStore from '../stores/cartStore';
 import toast from 'react-hot-toast';
+import { BAADMAY_CONFIG, calculateInstallmentAmount } from '../constants/payment';
 
 const ProductDetailPage = () => {
   const { id } = useParams();
@@ -49,8 +50,8 @@ const ProductDetailPage = () => {
   const discount = product.compare_price > product.price
     ? Math.round(((product.compare_price - product.price) / product.compare_price) * 100) : 0;
 
-  // Calculate installment amount (divide by 3, round up to nearest whole number)
-  const installmentAmount = Math.ceil(product.price / 3);
+  // Calculate installment amount using shared utility
+  const installmentAmount = calculateInstallmentAmount(product.price);
 
   return (
     <div className="space-y-8">
@@ -76,11 +77,11 @@ const ProductDetailPage = () => {
             )}
           </div>
           {/* Baadmay Installment Payment Option */}
-          {product.price >= 1000 && (
+          {product.price >= BAADMAY_CONFIG.MIN_PRICE_THRESHOLD && (
             <div className="flex items-center gap-2 bg-gray-50 p-2 rounded-lg">
               <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">baadmay</span>
               <span className="text-sm text-gray-700">
-                Pay in 3 Installments of <span className="font-bold text-green-600">৳{installmentAmount.toLocaleString()}</span>
+                {BAADMAY_CONFIG.NUM_INSTALLMENTS} কিস্তিতে পরিশোধ করুন <span className="font-bold text-green-600">৳{installmentAmount.toLocaleString()}</span>
               </span>
             </div>
           )}
