@@ -5,6 +5,9 @@ import useCartStore from '../stores/cartStore';
 const CartPage = () => {
   const { items, updateQuantity, removeItem, getTotal } = useCartStore();
   const deliveryCharge = getTotal() > 1000 ? 0 : 60;
+  const totalWithDelivery = getTotal() + deliveryCharge;
+  // Calculate installment amount for total (divide by 3, round up to nearest whole number)
+  const installmentAmount = Math.ceil(totalWithDelivery / 3);
 
   if (items.length === 0) return (
     <div className="text-center py-16">
@@ -42,7 +45,16 @@ const CartPage = () => {
       <div className="card p-4 space-y-2">
         <div className="flex justify-between text-sm"><span>পণ্যের মোট:</span><span>৳{getTotal().toLocaleString()}</span></div>
         <div className="flex justify-between text-sm"><span>ডেলিভারি:</span><span className={deliveryCharge === 0 ? 'text-green-600' : ''}>{deliveryCharge === 0 ? 'বিনামূল্যে' : `৳${deliveryCharge}`}</span></div>
-        <div className="flex justify-between font-bold text-lg border-t pt-2"><span>সর্বমোট:</span><span className="text-red-600">৳{(getTotal() + deliveryCharge).toLocaleString()}</span></div>
+        <div className="flex justify-between font-bold text-lg border-t pt-2"><span>সর্বমোট:</span><span className="text-red-600">৳{totalWithDelivery.toLocaleString()}</span></div>
+        {/* Baadmay Installment Option for cart total >= 1000 */}
+        {totalWithDelivery >= 1000 && (
+          <div className="flex items-center justify-center gap-2 bg-gray-50 p-2 rounded-lg mt-2">
+            <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">baadmay</span>
+            <span className="text-sm text-gray-700">
+              Pay in 3 Installments of <span className="font-bold text-green-600">৳{installmentAmount.toLocaleString()}</span>
+            </span>
+          </div>
+        )}
       </div>
       <Link to="/checkout" className="btn-primary w-full block text-center py-3 text-base">অর্ডার করুন →</Link>
     </div>

@@ -49,6 +49,9 @@ const ProductDetailPage = () => {
   const discount = product.compare_price > product.price
     ? Math.round(((product.compare_price - product.price) / product.compare_price) * 100) : 0;
 
+  // Calculate installment amount (divide by 3, round up to nearest whole number)
+  const installmentAmount = Math.ceil(product.price / 3);
+
   return (
     <div className="space-y-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -72,6 +75,15 @@ const ProductDetailPage = () => {
               </>
             )}
           </div>
+          {/* Baadmay Installment Payment Option */}
+          {product.price >= 1000 && (
+            <div className="flex items-center gap-2 bg-gray-50 p-2 rounded-lg">
+              <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">baadmay</span>
+              <span className="text-sm text-gray-700">
+                Pay in 3 Installments of <span className="font-bold text-green-600">৳{installmentAmount.toLocaleString()}</span>
+              </span>
+            </div>
+          )}
           {product.description && <p className="text-gray-600 text-sm">{product.description}</p>}
           <div className="flex items-center gap-3">
             <label className="text-sm font-medium">পরিমাণ:</label>
