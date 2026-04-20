@@ -594,7 +594,13 @@ SELECT
 FROM categories WHERE slug = 'home-appliance'
 ON CONFLICT (sku) DO NOTHING;
 
--- Add inventory for all stores
+-- Add inventory for all stores (initial random stock)
+INSERT INTO inventory (store_id, product_id, quantity, min_stock_level)
+SELECT s.id, p.id, (RANDOM() * 50 + 10)::INTEGER, 5
+FROM stores s CROSS JOIN products p
+ON CONFLICT (store_id, product_id, variant_id) DO NOTHING;
+
+-- Seed additional inventory for each store (fixed 50 units per product)
 INSERT INTO inventory (store_id, product_id, quantity, min_stock_level)
 SELECT s.id, p.id, 50, 10
 FROM stores s CROSS JOIN products p
